@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">SearchByGenre</string>
+
+    <string-array name="Genre">
+        <item>Select a Genre</item>
+        <item>Fiction</item>
+        <item>Biographies</item>
+        <item>Mental Health</item>
+        <item>Romance</item>
+        <item>Children</item>
+        <item>Science</item>
+        <item>History</item>
+
+    </string-array>
+</resources>
