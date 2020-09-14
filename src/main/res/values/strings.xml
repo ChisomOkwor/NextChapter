@@ -1,5 +1,6 @@
 <resources>
-    <string name="app_name">SearchByGenre</string>
+    <string name="app_name">4Clubs</string>
+    <string name="join_club">JOIN CLUB</string>
 
     <string-array name="Genre">
         <item>Select a Genre</item>
