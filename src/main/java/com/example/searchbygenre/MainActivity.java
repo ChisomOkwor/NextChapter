@@ -25,12 +25,11 @@ public class MainActivity extends AppCompatActivity {
     public static final String KEY_ITEM_POSITION = "item_position";
     public static final int EDIT_TEXT_CODE = 20;
     List<String> items =  new ArrayList<>();
-    Button startClubBtn;
     Button joinClubBtn;
     Button createBtn;
     EditText etClubName;
     RecyclerView rvItems;
-    ItemsAdapter itemsAdapter;
+    ClubsAdapter clubsAdapter;
     TextView myClubz;
     DatabaseHelper myDb;
 
@@ -41,20 +40,29 @@ public class MainActivity extends AppCompatActivity {
         myDb = new DatabaseHelper(this);
 
 //      myClubz = findViewById(R.id.myClubz);
-//      startClubBtn = findViewById(R.id.sta rtClubBtn);
+
+
+        joinClubBtn = findViewById(R.id.joinClubBtn);
         createBtn = findViewById(R.id.createBtn);
-//      joinClubBtn = findViewById(R.id.joinClubBtn);
         etClubName = findViewById(R.id.etClubName);
         rvItems = findViewById(R.id.rvItems);
         loadItems();
 
-        ItemsAdapter.OnLongClickListener onLongClickListener = new ItemsAdapter.OnLongClickListener(){
+
+        joinClubBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openJoinClubActivity();
+            }
+        });
+
+        ClubsAdapter.OnLongClickListener onLongClickListener = new ClubsAdapter.OnLongClickListener(){
             @Override
             public void onItemLongClicked(int position) {
                 // Delete the item from the model
                 items.remove(position);
                 // Notify the adapter
-                itemsAdapter.notifyItemRemoved(position);
+                clubsAdapter.notifyItemRemoved(position);
                 Toast.makeText(getApplicationContext(), "Item removed ", Toast.LENGTH_SHORT).show();
                 Integer deletedRow = myDb.deleteData(etClubName.getText().toString());
                 if (deletedRow > 0)
@@ -65,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        ItemsAdapter.OnClickListener onClickListener = new ItemsAdapter.OnClickListener() {
+        ClubsAdapter.OnClickListener onClickListener = new ClubsAdapter.OnClickListener() {
             @Override
             public void onItemClicked(int position) {
                 Log.d("MainActivity", "Single click at position " + position);
@@ -79,26 +87,10 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        itemsAdapter = new ItemsAdapter(items, onLongClickListener, onClickListener);
-        rvItems.setAdapter(itemsAdapter);
+        clubsAdapter = new ClubsAdapter(items, onLongClickListener, onClickListener);
+        rvItems.setAdapter(clubsAdapter);
         rvItems.setLayoutManager(new LinearLayoutManager(this));
 
-//        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
-//            @Override
-//            public int getMovementFlags(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
-//                return 0;
-//            }
-//
-//            @Override
-//            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-//                return false;
-//            }
-//
-//            @Override
-//            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-//                    removeItem(() viewHolder.itemView.getTag());
-//            }
-//        });
 
         createBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -106,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
                 String todoItem = etClubName.getText().toString();
                 items.add(todoItem);
                 // Notify adapter that an item is inserted
-                itemsAdapter.notifyItemInserted(items.size() -1);
+                clubsAdapter.notifyItemInserted(items.size() -1);
                 etClubName.setText("");
               //  Toast.makeText(getApplicationContext(), "Item added", Toast.LENGTH_SHORT).show();
                 saveItems(todoItem);
@@ -127,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
             // Update the model at the right position with a new item
             items.set(position, itemText);
             // Notify the adapter
-            itemsAdapter.notifyItemChanged(position);
+            clubsAdapter.notifyItemChanged(position);
             // Persist the changes
             Toast.makeText(getApplicationContext(), "Item updated!", Toast.LENGTH_SHORT).show();
         } else {
@@ -157,5 +149,10 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(MainActivity.this, "Data Inserted", Toast.LENGTH_LONG).show();
         else
             Toast.makeText(MainActivity.this, "Data not Inserted", Toast.LENGTH_LONG);
+    }
+
+    public void openJoinClubActivity(){
+        Intent intent = new Intent(this, JoinClub.class);
+        startActivity(intent);
     }
 }

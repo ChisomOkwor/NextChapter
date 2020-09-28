@@ -1,95 +1,98 @@
 package com.example.searchbygenre;
 
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.textclassifier.TextClassifierEvent;
+import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 
-// Responsible for displaying data from the model into a row in the recycler view
-public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder>{
+public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.MyViewHolder> {
+
+    private Context mContext ;
+    private List<Book> mData ;
 
     public interface  OnClickListener{
         void onItemClicked(int position);
     }
 
-    public interface OnLongClickListener {
-        void onItemLongClicked(int position);
+    public ItemsAdapter(Context mContext, List<Book> mData) {
+        this.mContext = mContext;
+        this.mData = mData;
     }
 
-    List<String> items;
-    OnLongClickListener longClickListener;
-    OnClickListener clickListener;
-    public ItemsAdapter(List<String> items, OnLongClickListener longClickListener, OnClickListener clickListener) {
-        this.clickListener = clickListener;
-        this.items = items;
-        this.longClickListener = longClickListener;
-    }
-
-    @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // Use Layout inflater to inflate a view
-        View todoView = LayoutInflater.from(parent.getContext()).inflate(android.R.layout.simple_list_item_1, parent, false);
-        // Wrap it inside a view Holder and return it
-        return new ViewHolder(todoView);
+    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view ;
+        LayoutInflater mInflater = LayoutInflater.from(mContext);
+        view = mInflater.inflate(R.layout.card_item_book,parent,false);
+        return new MyViewHolder(view);
     }
 
-    //Tells the recycler view how may items are in the List
+    @Override
+    public void onBindViewHolder(MyViewHolder holder, final int position) {
+
+        holder.tv_book_title.setText(mData.get(position).getTitle());
+
+        Bitmap bmp = null;
+        try {
+            URL url = new URL(mData.get(position).getThumbnail());
+            bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        holder.img_book_thumbnail.setImageBitmap(bmp);
+
+//       holder.img_book_thumbnail.setImageResource(mData.get(position).getThumbnail());
+            holder.cardView.setOnClickListener(new View.OnClickListener() {
+                @Override
+            public void onClick(View v) {
+
+                Intent intent = new Intent(mContext, BookActivity.class);
+
+                System.out.println("Clicked ");
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                // passing data to the book activity
+                intent.putExtra("Title",mData.get(position).getTitle());
+                intent.putExtra("Description",mData.get(position).getDescription());
+                intent.putExtra("Thumbnail",mData.get(position).getThumbnail());
+                intent.putExtra("Category",mData.get(position).getCategory());
+                // start the activity
+
+                mContext.startActivity(intent);
+            }
+        });
+    }
+
     @Override
     public int getItemCount() {
-        if (items != null) {
-            return items.size();
-        }
-        else{
-            return 0;
-        }
-    }
-    // Responsible for binding data to a particular view holder
-    @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        // Grab the item at the position
-        String item = items.get(position);
-      //  String id = items.get(id);
-        // Bind the item into the specified view holder
-        holder.bind(item);
-
+        return mData.size();
     }
 
-    // Container to provide easy access to views that represent each row of the list
-    class ViewHolder extends RecyclerView.ViewHolder{
-        TextView tvItem;
-        public ViewHolder(@NonNull View itemView) {
+    public static class MyViewHolder extends RecyclerView.ViewHolder {
+        TextView tv_book_title;
+        ImageView img_book_thumbnail;
+        CardView cardView ;
+
+        public MyViewHolder(View itemView) {
             super(itemView);
-            tvItem = itemView.findViewById(android.R.id.text1);
-        }
 
-        // Update the view inside of the view holder with this data
-        // Inform us what position was tapped
-        public void bind(String item) {
-            tvItem.setText(item);
+            tv_book_title = (TextView) itemView.findViewById(R.id.book_title_id) ;
+            img_book_thumbnail = (ImageView) itemView.findViewById(R.id.book_img_id);
+            cardView = (CardView) itemView.findViewById(R.id.cardview_id);
 
-            tvItem.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    clickListener.onItemClicked(getAdapterPosition());
-                }
-            });
-
-            tvItem.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    // Remove the item from the recycler view
-                    // Notify the listener on which position was long pressed
-                    longClickListener.onItemLongClicked(getAdapterPosition());
-                    return false;
-                }
-            });
         }
     }
 }
