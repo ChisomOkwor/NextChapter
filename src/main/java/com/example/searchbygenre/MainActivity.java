@@ -141,7 +141,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
     private void saveItems(String Item){
         // Add item to the Database
         boolean isInserted = myDb.insertData(Item);

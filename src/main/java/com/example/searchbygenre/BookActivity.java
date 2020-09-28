@@ -49,7 +49,7 @@ public class BookActivity extends AppCompatActivity {
         tvtitle.setText(Title);
         tvdescription.setText(Description);
 
-
+        //Load Image using String URL
         Bitmap bmp = null;
         try {
             URL url = new URL(Image);
@@ -58,6 +58,8 @@ public class BookActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         img.setImageBitmap(bmp);
+
+        //load Image using saved Thumbnail
       //  img.LoadImageFromWebOperations(Image);
      //   img.setImageResource(Image);
 
