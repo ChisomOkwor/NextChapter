@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".JoinClub">
+
+
+    <EditText
+        android:id="@+id/etClubID"
+        android:layout_width="283dp"
+        android:layout_height="56dp"
+        android:layout_marginTop="16dp"
+        android:ems="10"
+        android:hint="Enter Club ID:"
+        android:inputType="textPersonName"
+        app:layout_constraintEnd_toStartOf="@+id/createBtn"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/startClubBtn" />
+
+    <Button
+        android:id="@+id/startClubBtn"
+        android:layout_width="195dp"
+        android:layout_height="42dp"
+        android:background="#EAE8E8"
+        android:text="START A CLUB"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/joinClubBtn"
+        android:layout_width="208dp"
+        android:layout_height="42dp"
+        android:background="#EAE8E8"
+        android:text="@string/join_club"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/startClubBtn"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/joinBtn"
+        android:layout_width="104dp"
+        android:layout_height="42dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:background="#8253D3"
+        android:text="JOIN"
+        android:textColor="#FBFBFB"
+        android:textColorHighlight="#FDFDFD"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/joinClubBtn" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

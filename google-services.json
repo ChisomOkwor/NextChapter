@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "410392779975",
+    "firebase_url": "https://clubz-42a08.firebaseio.com",
+    "project_id": "clubz-42a08",
+    "storage_bucket": "clubz-42a08.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:410392779975:android:84424b5b1c346713b472e2",
+        "android_client_info": {
+          "package_name": "com.example.searchbygenre"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "410392779975-hqk4akvp90434l21r1fpsam5pfa0rrga.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.searchbygenre",
+            "certificate_hash": "0c5e9401d4fe674a01e5315db84750ae7ad3b19c"
+          }
+        },
+        {
+          "client_id": "410392779975-drqk7m116slk1sj4l1mrnmmtotv3k20m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBjdKfyRUWh9iilSnO7vyZuCqu6J-ZCn1Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "410392779975-drqk7m116slk1sj4l1mrnmmtotv3k20m.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

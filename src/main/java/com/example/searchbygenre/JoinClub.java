@@ -13,7 +13,7 @@ public class JoinClub extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_join_club);
+        setContentView(R.layout.activity_join_club2);
         startClubBtn = findViewById(R.id.startClubBtn);
 
         startClubBtn.setOnClickListener(new View.OnClickListener() {
