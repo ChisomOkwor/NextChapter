@@ -17,6 +17,16 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,25 +40,51 @@ public class MainActivity extends AppCompatActivity {
     EditText etClubName;
     RecyclerView rvItems;
     ClubsAdapter clubsAdapter;
-    TextView myClubz;
-    DatabaseHelper myDb;
+
+    DatabaseReference myRef;
+    private FirebaseDatabase database;
+    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthListener;
+    private  String userID;
+    FirebaseUser user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        myDb = new DatabaseHelper(this);
 
-//      myClubz = findViewById(R.id.myClubz);
+        mAuth = FirebaseAuth.getInstance();
+        database = FirebaseDatabase.getInstance();
+        myRef = database.getReference("Clubs");
+        user = mAuth.getCurrentUser();
 
-
+        userID = user.getUid();
         joinClubBtn = findViewById(R.id.joinClubBtn);
         createBtn = findViewById(R.id.createBtn);
         etClubName = findViewById(R.id.etClubName);
         rvItems = findViewById(R.id.rvItems);
-        loadItems();
 
+        loadClubList();
+        getUser();
 
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+               // FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    // User is signed in
+                    Log.i("LOGIN STAT", "onAuthStateChanged:signed_in:" + user.getUid());
+                    Toast.makeText(getApplicationContext(), "Item updated!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Successfully signed in with: " + user.getEmail(), Toast.LENGTH_SHORT ).show();
+                } else {
+                    // User is signed out
+                    Log.i("LOGIN STAT", "onAuthStateChanged:signed_out");
+                    Toast.makeText(getApplicationContext(), "Successfully signed out", Toast.LENGTH_SHORT ).show();
+                }
+            }
+        };
+
+        // Button to Join a new Club by Club ID
         joinClubBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -64,12 +100,7 @@ public class MainActivity extends AppCompatActivity {
                 // Notify the adapter
                 clubsAdapter.notifyItemRemoved(position);
                 Toast.makeText(getApplicationContext(), "Item removed ", Toast.LENGTH_SHORT).show();
-                Integer deletedRow = myDb.deleteData(etClubName.getText().toString());
-                if (deletedRow > 0)
-
-                    Toast.makeText(getApplicationContext(), "Data Deleted ", Toast.LENGTH_SHORT).show();
-                else
-                    Toast.makeText(getApplicationContext(), "Data Deleted ", Toast.LENGTH_SHORT).show();
+                // DELETE FROM FIREBASE DB HERE, MAYBE BY ID;
             }
         };
 
@@ -78,11 +109,11 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClicked(int position) {
                 Log.d("MainActivity", "Single click at position " + position);
                 // Create the new Activity
-                Intent i = new Intent(MainActivity.this,ClubActivity.class);
+                Intent i = new Intent(MainActivity.this, ClubActivity.class);
                 // Pass the data being edited
                 i.putExtra(KEY_ITEM_TEXT, items.get(position));
                 i.putExtra(KEY_ITEM_POSITION, position);
-                // Display the Activity
+                //Start the Club Activity
                 startActivityForResult(i, EDIT_TEXT_CODE);
             }
         };
@@ -90,65 +121,86 @@ public class MainActivity extends AppCompatActivity {
         clubsAdapter = new ClubsAdapter(items, onLongClickListener, onClickListener);
         rvItems.setAdapter(clubsAdapter);
         rvItems.setLayoutManager(new LinearLayoutManager(this));
-
-
         createBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String todoItem = etClubName.getText().toString();
-                items.add(todoItem);
-                // Notify adapter that an item is inserted
-                clubsAdapter.notifyItemInserted(items.size() -1);
-                etClubName.setText("");
-              //  Toast.makeText(getApplicationContext(), "Item added", Toast.LENGTH_SHORT).show();
-                saveItems(todoItem);
+                registerClub();
             }
         });
     }
 
-    // handle the result of the edit Activity
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (RESULT_OK == resultCode && requestCode == EDIT_TEXT_CODE) {
-            // Retrieve the updated text value
-            String itemText = data.getStringExtra(KEY_ITEM_TEXT);
-            // extract the original position of the edited item from the position key
-            int position = data.getExtras().getInt(KEY_ITEM_POSITION);
-
-            // Update the model at the right position with a new item
-            items.set(position, itemText);
-            // Notify the adapter
-            clubsAdapter.notifyItemChanged(position);
-            // Persist the changes
-            Toast.makeText(getApplicationContext(), "Item updated!", Toast.LENGTH_SHORT).show();
-        } else {
-            Log.w("MainActivity", "Unknown call to onActivityResult");
-        }
-    }
-
-    public void loadItems() {
-        Cursor result = myDb.getAllData();
-        if (result.getCount() == 0){
-            // show message
+    // Push Club Info to DB
+    private void registerClub(){
+        String clubName = etClubName.getText().toString();
+        if(clubName.isEmpty()){
+            etClubName.setError("Full Name is Required");
+            etClubName.requestFocus();
             return;
         }
-      //  StringBuffer buffer = new StringBuffer();
-        while(result.moveToNext()){
-            items.add(result.getString(1));
-            //buffer.append("ID : " + result.getString(0) + "\n");
-            //buffer.append("Club Name : " + result.getString(1) + "\n\n");
-        }
+        // Change edit text item to empty
+        etClubName.setText("");
+
+        // Add to Array
+        items.add(clubName);
+
+        // Notify adapter that an item is inserted
+        clubsAdapter.notifyItemInserted(items.size() -1);
+
+        // Add to Firebase DB
+        String key = myRef.push().getKey();
+        myRef.child(key).setValue(clubName);
     }
 
-    private void saveItems(String Item){
-        // Add item to the Database
-        boolean isInserted = myDb.insertData(Item);
-        if(isInserted == true)
-            Toast.makeText(MainActivity.this, "Data Inserted", Toast.LENGTH_LONG).show();
-        else
-            Toast.makeText(MainActivity.this, "Data not Inserted", Toast.LENGTH_LONG);
+    public void loadClubList(){
+        //DatabaseReference myRef = database.getReference("Clubs");
+        myRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                ;
+                for (DataSnapshot postSnapshot: snapshot.getChildren()) {
+                    String club_name = postSnapshot.getValue(String.class);
+                    items.add(club_name);
+                    Log.i("FIREBASE DB", club_name);
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                System.out.println("The read failed: " + error.getMessage());
+            }
+        });
     }
+
+    public void getUser(){
+        myRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again.
+                // whenever data at this location is updated.
+                for(DataSnapshot ds : dataSnapshot.getChildren()){
+                    User uInfo = new User();
+                    Log.i("GET USER INFO", "onDataChange: " + uInfo);
+                    //uInfo.setName(ds.child(userID).getValue(User.class).getName()); //set the name
+                    //uInfo.setEmail(ds.child(userID).getValue(User.class).getEmail()); //set the email
+
+                    //display all the information
+                    Log.d("user info", "showData: name: " + uInfo.getName());
+                    Log.d("user info", "showData: email: " + uInfo.getEmail());
+
+                    ArrayList<String> array  = new ArrayList<>();
+                    array.add(uInfo.getName());
+                    array.add(uInfo.getEmail());
+                    // Log.i("Test User info", uInfo.getName());
+                    // Log.i("Test user info",  uInfo.getEmail());
+                    // ArrayAdapter adapter = new ArrayAdapter(this,android.R.layout.simple_list_item_1,array);
+                   // mListView.setAdapter(adapter);
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+}
 
     public void openJoinClubActivity(){
         Intent intent = new Intent(this, JoinClub.class);

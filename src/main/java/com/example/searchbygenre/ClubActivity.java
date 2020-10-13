@@ -13,15 +13,9 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 
-
-import static android.R.layout.simple_list_item_1;
-
 public class ClubActivity extends AppCompatActivity {
-
-    DatabaseHelper myDb;
     Button searchbooks;
     TextView bookName;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

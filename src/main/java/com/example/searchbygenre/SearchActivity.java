@@ -34,14 +34,13 @@ public class SearchActivity extends AppCompatActivity {
     public static final String KEY_ITEM_TEXT = "item_text";
     public static final String KEY_ITEM_POSITION = "item_position";
     public static final int EDIT_TEXT_CODE = 20;
-    DatabaseHelper myDb;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
         getSupportActionBar().setTitle("Select A Book");
-        myDb = new DatabaseHelper(this);
 
         final Spinner mySpinner = (Spinner) findViewById(R.id.spinner);
 
@@ -121,7 +120,6 @@ public class SearchActivity extends AppCompatActivity {
                                                 Log.e("Rest Response", error.toString());
                                                 }
                                             });
-
 
                                         lstBook.add(new Book(title, "Category", "Description","thumbnail_url" ));
                                     }

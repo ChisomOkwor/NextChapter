@@ -20,7 +20,6 @@ public class BookActivity extends AppCompatActivity {
     TextView tvtitle,tvdescription,tvcategory;
     ImageView img;
     Button selectBook;
-
     String Title;
     String Description;
     String Genre;
@@ -35,7 +34,6 @@ public class BookActivity extends AppCompatActivity {
         tvdescription = (TextView) findViewById(R.id.txtDesc);
         tvcategory = (TextView) findViewById(R.id.txtCat);
         img = (ImageView) findViewById(R.id.bookthumbnail);
-
         selectBook = (Button)  findViewById(R.id.button);
 
         // Recieve data

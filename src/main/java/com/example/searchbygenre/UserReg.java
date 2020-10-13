@@ -25,7 +25,6 @@ public class UserReg extends AppCompatActivity implements View.OnClickListener {
     private FirebaseAuth mAuth;
     private EditText etFullName, etEmail, etPassword;
     private TextView registerBtn;
-
     private ProgressBar progressBar;
 
     @Override
@@ -69,7 +68,6 @@ public class UserReg extends AppCompatActivity implements View.OnClickListener {
             etEmail.setError("Full Name is Required");
             etEmail.requestFocus();
             return;
-
         }
 
         if(!Patterns.EMAIL_ADDRESS.matcher(email).matches()){

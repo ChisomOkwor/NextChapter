@@ -19,7 +19,6 @@ import java.net.URL;
 import java.util.List;
 
 public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.MyViewHolder> {
-
     private Context mContext ;
     private List<Book> mData ;
 
@@ -44,8 +43,8 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.MyViewHolder
     public void onBindViewHolder(MyViewHolder holder, final int position) {
 
         holder.tv_book_title.setText(mData.get(position).getTitle());
-
         Bitmap bmp = null;
+
         try {
             URL url = new URL(mData.get(position).getThumbnail());
             bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
@@ -54,7 +53,7 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.MyViewHolder
         }
         holder.img_book_thumbnail.setImageBitmap(bmp);
 
-//       holder.img_book_thumbnail.setImageResource(mData.get(position).getThumbnail());
+//          holder.img_book_thumbnail.setImageResource(mData.get(position).getThumbnail());
             holder.cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
             public void onClick(View v) {
@@ -70,7 +69,6 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.MyViewHolder
                 intent.putExtra("Thumbnail",mData.get(position).getThumbnail());
                 intent.putExtra("Category",mData.get(position).getCategory());
                 // start the activity
-
                 mContext.startActivity(intent);
             }
         });
