@@ -14,7 +14,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 public class ClubActivity extends AppCompatActivity {
-    Button searchbooks;
+    Button searchForBook;
     TextView bookName;
 
     @Override
@@ -22,25 +22,32 @@ public class ClubActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_club);
 
-        String clubName = getIntent().getStringExtra(MainActivity.KEY_ITEM_TEXT);
+        String club_name = getIntent().getExtras().getString("CLUB_NAME");
+        getSupportActionBar().setTitle(club_name);
 
-        getSupportActionBar().setTitle(clubName);
-
-        searchbooks = findViewById(R.id.searchBookBtn);
-        searchbooks.setOnClickListener(new View.OnClickListener() {
+        searchForBook = findViewById(R.id.searchBookBtn);
+        bookName = findViewById(R.id.bookNameClub);
+        searchForBook.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 openSearchActivity();
             }
         });
 
-        // Recieve data
+        // Receive data
         Intent intent = getIntent();
         String Title = intent.getExtras().getString("Title");
         String Description = intent.getExtras().getString("Description");
         String Genre = intent.getExtras().getString("Description");
-        String Image = intent.getExtras().getString("Thumbnail") ;
-        Book book = new Book(Title, Genre, Description, Image);
+
+        Log.i("BOOK ","Received book " + Title);
+        Book book = new Book(Title, Genre, Description);
+
+        if(Title != null){
+            bookName.setText("Current Book "+ Title);
+            searchForBook.setText("Reselect a book");
+            // TODO: Add book to data base under club
+        }
     };
 
     public void openSearchActivity(){

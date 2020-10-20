@@ -47,42 +47,19 @@ public class BookActivity extends AppCompatActivity {
         tvtitle.setText(Title);
         tvdescription.setText(Description);
 
-        //Load Image using String URL
-        Bitmap bmp = null;
-        try {
-            URL url = new URL(Image);
-            bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        img.setImageBitmap(bmp);
-
-        //load Image using saved Thumbnail
-      //  img.LoadImageFromWebOperations(Image);
-     //   img.setImageResource(Image);
 
         selectBook.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                openClubActivity(Title, Description, Image);
+                openClubActivity(Title, Description);
             }
         });
     }
-    public void openClubActivity(String title, String description, String image){
+    public void openClubActivity(String title, String description){
         Intent intent = new Intent(this, ClubActivity.class);
         intent.putExtra("Title", title);
-        intent.putExtra("Thumbnail", title);
         intent.putExtra("Description", title);
         startActivity(intent);
     }
 
-    public static Drawable LoadImageFromWebOperations(String url) {
-        try {
-            InputStream is = (InputStream) new URL(url).getContent();
-            Drawable d = Drawable.createFromStream(is, "src name");
-            return d;
-        } catch (Exception e) {
-            return null;
-        }
-    }
 }

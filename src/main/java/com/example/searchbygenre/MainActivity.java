@@ -13,6 +13,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -29,12 +30,13 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
     public static final String KEY_ITEM_TEXT = "item_text";
     public static final String KEY_ITEM_POSITION = "item_position";
     public static final int EDIT_TEXT_CODE = 20;
-    List<String> items =  new ArrayList<>();
+    List<Club> items =  new ArrayList<>();
     Button joinClubBtn;
     Button createBtn;
     EditText etClubName;
@@ -45,13 +47,15 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseDatabase database;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
-    private  String userID;
+    private String userID;
     FirebaseUser user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        getSupportActionBar().setTitle("Next Chapter: Clubs");
 
         mAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
@@ -107,20 +111,15 @@ public class MainActivity extends AppCompatActivity {
         ClubsAdapter.OnClickListener onClickListener = new ClubsAdapter.OnClickListener() {
             @Override
             public void onItemClicked(int position) {
-                Log.d("MainActivity", "Single click at position " + position);
-                // Create the new Activity
-                Intent i = new Intent(MainActivity.this, ClubActivity.class);
-                // Pass the data being edited
-                i.putExtra(KEY_ITEM_TEXT, items.get(position));
-                i.putExtra(KEY_ITEM_POSITION, position);
-                //Start the Club Activity
-                startActivityForResult(i, EDIT_TEXT_CODE);
+
+                openSlectedClub(position);
+
             }
         };
 
         clubsAdapter = new ClubsAdapter(items, onLongClickListener, onClickListener);
-        rvItems.setAdapter(clubsAdapter);
         rvItems.setLayoutManager(new LinearLayoutManager(this));
+        rvItems.setAdapter(clubsAdapter);
         createBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -129,26 +128,41 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void openSlectedClub(int position) {
+        Log.d("MainActivity", "Single click at position " + position);
+        // Create the new Activity
+        Intent i = new Intent(MainActivity.this, ClubActivity.class);
+        // Pass the data being edited
+
+        Club club = items.get(position);
+        // Pass the Club name
+        i.putExtra("CLUB_NAME", club.getClubName());
+        i.putExtra(KEY_ITEM_POSITION, position);
+        //Start the Club Activity
+        startActivityForResult(i, EDIT_TEXT_CODE);
+    }
+
     // Push Club Info to DB
     private void registerClub(){
-        String clubName = etClubName.getText().toString();
-        if(clubName.isEmpty()){
-            etClubName.setError("Full Name is Required");
+        String club_name = etClubName.getText().toString();
+        if(club_name.isEmpty()){
+            etClubName.setError("A Club name is Required");
             etClubName.requestFocus();
             return;
         }
         // Change edit text item to empty
-        etClubName.setText("");
 
+        Club club = new Club(club_name);
+        etClubName.setText("");
         // Add to Array
-        items.add(clubName);
+        items.add(club);
 
         // Notify adapter that an item is inserted
         clubsAdapter.notifyItemInserted(items.size() -1);
 
         // Add to Firebase DB
         String key = myRef.push().getKey();
-        myRef.child(key).setValue(clubName);
+        myRef.child(key).setValue(club);
     }
 
     public void loadClubList(){
@@ -156,11 +170,14 @@ public class MainActivity extends AppCompatActivity {
         myRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                ;
+                items.clear();
                 for (DataSnapshot postSnapshot: snapshot.getChildren()) {
-                    String club_name = postSnapshot.getValue(String.class);
-                    items.add(club_name);
-                    Log.i("FIREBASE DB", club_name);
+                  //  String clubId = postSnapshot.getKey();
+                   // DatabaseReference clubIdRef = myRef.child("Clubs").child(clubId);
+                    Club club = postSnapshot.getValue(Club.class);
+                    System.out.println(club.club_name);
+                    items.add(club);
+                   // Log.i("FIREBASE DB", club.getClubName());
                 }
             }
             @Override
@@ -179,8 +196,6 @@ public class MainActivity extends AppCompatActivity {
                 for(DataSnapshot ds : dataSnapshot.getChildren()){
                     User uInfo = new User();
                     Log.i("GET USER INFO", "onDataChange: " + uInfo);
-                    //uInfo.setName(ds.child(userID).getValue(User.class).getName()); //set the name
-                    //uInfo.setEmail(ds.child(userID).getValue(User.class).getEmail()); //set the email
 
                     //display all the information
                     Log.d("user info", "showData: name: " + uInfo.getName());
@@ -189,10 +204,6 @@ public class MainActivity extends AppCompatActivity {
                     ArrayList<String> array  = new ArrayList<>();
                     array.add(uInfo.getName());
                     array.add(uInfo.getEmail());
-                    // Log.i("Test User info", uInfo.getName());
-                    // Log.i("Test user info",  uInfo.getEmail());
-                    // ArrayAdapter adapter = new ArrayAdapter(this,android.R.layout.simple_list_item_1,array);
-                   // mListView.setAdapter(adapter);
                 }
             }
             @Override
@@ -200,7 +211,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-}
+    }
 
     public void openJoinClubActivity(){
         Intent intent = new Intent(this, JoinClub.class);

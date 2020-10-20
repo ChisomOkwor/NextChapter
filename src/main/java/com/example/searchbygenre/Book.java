@@ -3,18 +3,18 @@ package com.example.searchbygenre;
 public class Book {
 
     private String Title;
-    private String Category ;
-    private String Description ;
-    private String ThumbnailURL ;
+    private String Category;
+    private String Description;
+
 
     public Book() {
     }
 
-    public Book(String title, String category, String description, String thumbnailurl) {
+    public Book(String title, String category, String description) {
         Title = title;
         Category = category;
         Description = description;
-        ThumbnailURL = thumbnailurl;
+
     }
 
 
@@ -30,9 +30,7 @@ public class Book {
         return Description;
     }
 
-    public String getThumbnail() {
-        return ThumbnailURL;
-    }
+
 
 
     public void setTitle(String title) {

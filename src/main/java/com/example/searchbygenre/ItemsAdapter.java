@@ -43,15 +43,7 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.MyViewHolder
     public void onBindViewHolder(MyViewHolder holder, final int position) {
 
         holder.tv_book_title.setText(mData.get(position).getTitle());
-        Bitmap bmp = null;
 
-        try {
-            URL url = new URL(mData.get(position).getThumbnail());
-            bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        holder.img_book_thumbnail.setImageBitmap(bmp);
 
 //          holder.img_book_thumbnail.setImageResource(mData.get(position).getThumbnail());
             holder.cardView.setOnClickListener(new View.OnClickListener() {
@@ -66,7 +58,6 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.MyViewHolder
                 // passing data to the book activity
                 intent.putExtra("Title",mData.get(position).getTitle());
                 intent.putExtra("Description",mData.get(position).getDescription());
-                intent.putExtra("Thumbnail",mData.get(position).getThumbnail());
                 intent.putExtra("Category",mData.get(position).getCategory());
                 // start the activity
                 mContext.startActivity(intent);

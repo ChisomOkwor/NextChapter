@@ -35,12 +35,10 @@ public class SearchActivity extends AppCompatActivity {
     public static final String KEY_ITEM_POSITION = "item_position";
     public static final int EDIT_TEXT_CODE = 20;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
-        getSupportActionBar().setTitle("Select A Book");
 
         final Spinner mySpinner = (Spinner) findViewById(R.id.spinner);
 
@@ -121,7 +119,7 @@ public class SearchActivity extends AppCompatActivity {
                                                 }
                                             });
 
-                                        lstBook.add(new Book(title, "Category", "Description","thumbnail_url" ));
+                                        lstBook.add(new Book(title, "Category", "Description"));
                                     }
                                     //   Log.i("Book array Response", lstBook.toString());
 
