@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.FileObserver;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
@@ -13,6 +14,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -27,9 +29,17 @@ public class LoginActivity extends AppCompatActivity implements  View.OnClickLis
 
     private FirebaseAuth mAuth;
     private ProgressBar progressBar;
+    Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //set app logo
+
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setLogo(R.drawable.icon_book);
+        getSupportActionBar().setDisplayUseLogoEnabled(true);
+
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         register = (TextView) findViewById(R.id.tvregister);
@@ -45,6 +55,8 @@ public class LoginActivity extends AppCompatActivity implements  View.OnClickLis
         progressBar.setVisibility(View.GONE);
 
         mAuth = FirebaseAuth.getInstance();
+
+
     }
 
     public void onClick(View v){
@@ -54,7 +66,14 @@ public class LoginActivity extends AppCompatActivity implements  View.OnClickLis
             break;
             
             case R.id.loginBtn:
-                userLogin();
+                if(mAuth.getCurrentUser() == null) {
+                    userLogin();
+                } else {
+                    Intent i = new Intent(LoginActivity.this, MainActivity.class);
+                    startActivity(i);
+                    Log.i("Check logged in", "onCreate: LOGGED IN");
+                }
+
                 break;
         }
     }

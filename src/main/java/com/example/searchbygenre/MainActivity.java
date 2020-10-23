@@ -52,11 +52,16 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //set app logo
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setLogo(R.drawable.icon_book);
+        getSupportActionBar().setDisplayUseLogoEnabled(true);
+
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         getSupportActionBar().setTitle("Next Chapter: Clubs");
-
         mAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
         myRef = database.getReference("Clubs");
@@ -71,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
         loadClubList();
         getUser();
 
+        //CHECK IS USER IS LOGGED IN
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -96,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //DELETE A CLUB
         ClubsAdapter.OnLongClickListener onLongClickListener = new ClubsAdapter.OnLongClickListener(){
             @Override
             public void onItemLongClicked(int position) {
@@ -108,12 +115,11 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
+        // OPEN A SELECTED CLUB
         ClubsAdapter.OnClickListener onClickListener = new ClubsAdapter.OnClickListener() {
             @Override
             public void onItemClicked(int position) {
-
                 openSlectedClub(position);
-
             }
         };
 
@@ -136,6 +142,7 @@ public class MainActivity extends AppCompatActivity {
 
         Club club = items.get(position);
         // Pass the Club name
+        // TODO: ACCESS CLUB NAME PERMANENTLY
         i.putExtra("CLUB_NAME", club.getClubName());
         i.putExtra(KEY_ITEM_POSITION, position);
         //Start the Club Activity
@@ -186,31 +193,17 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
+    // TODO: MAKE SURE GETTING USER DATA WORKS
     public void getUser(){
-        myRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // This method is called once with the initial value and again.
-                // whenever data at this location is updated.
-                for(DataSnapshot ds : dataSnapshot.getChildren()){
-                    User uInfo = new User();
-                    Log.i("GET USER INFO", "onDataChange: " + uInfo);
+        FirebaseUser user = mAuth.getCurrentUser();
+        if(user == null) {
+            String userName = user.getDisplayName();
+            String email = user.getEmail();
 
-                    //display all the information
-                    Log.d("user info", "showData: name: " + uInfo.getName());
-                    Log.d("user info", "showData: email: " + uInfo.getEmail());
-
-                    ArrayList<String> array  = new ArrayList<>();
-                    array.add(uInfo.getName());
-                    array.add(uInfo.getEmail());
-                }
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
+            Log.i("USER", "getUser: " + userName + " " + email);
+        } else {
+            Log.i("Check logged in", "onCreate: NOT WORKING");
+        }
     }
 
     public void openJoinClubActivity(){

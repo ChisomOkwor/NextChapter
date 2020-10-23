@@ -2,9 +2,6 @@ package com.example.searchbygenre;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,11 +11,9 @@ import android.widget.TextView;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.io.IOException;
-import java.net.URL;
 import java.util.List;
 
-public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.MyViewHolder> {
+public class BooksAdapter extends RecyclerView.Adapter<BooksAdapter.MyViewHolder> {
     private Context mContext ;
     private List<Book> mData ;
 
@@ -26,7 +21,7 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.MyViewHolder
         void onItemClicked(int position);
     }
 
-    public ItemsAdapter(Context mContext, List<Book> mData) {
+    public BooksAdapter(Context mContext, List<Book> mData) {
         this.mContext = mContext;
         this.mData = mData;
     }
@@ -44,14 +39,11 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.MyViewHolder
 
         holder.tv_book_title.setText(mData.get(position).getTitle());
 
-
-//          holder.img_book_thumbnail.setImageResource(mData.get(position).getThumbnail());
             holder.cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
             public void onClick(View v) {
 
                 Intent intent = new Intent(mContext, BookActivity.class);
-
                 System.out.println("Clicked ");
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 

@@ -12,7 +12,6 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
-import java.util.Random;
 
 // Responsible for displaying data from the model into a row in the recycler view
 public class ClubsAdapter extends RecyclerView.Adapter<ClubsAdapter.ViewHolder>{
@@ -66,14 +65,10 @@ public class ClubsAdapter extends RecyclerView.Adapter<ClubsAdapter.ViewHolder>{
 
     // Container to provide easy access to views that represent each row of the list
     class ViewHolder extends RecyclerView.ViewHolder{
-
         CardView cardView;
         TextView tvItem;
         ImageView img_club_thumbnail;
         TextView club_name;
-        Random rand = new Random();
-
-
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -82,12 +77,8 @@ public class ClubsAdapter extends RecyclerView.Adapter<ClubsAdapter.ViewHolder>{
             club_name = (TextView) itemView.findViewById(R.id.club_name_id) ;
             img_club_thumbnail = (ImageView) itemView.findViewById(R.id.club_img_id);
             cardView = (CardView) itemView.findViewById(R.id.cardview_id_club);
-//            int int_random = rand.nextInt(2);
-//            if (int_random == 0){
+
             img_club_thumbnail.setImageResource(R.drawable.book_flower);
-//            }else{
-//                img_club_thumbnail.setImageResource(R.drawable.book_coffee);
-//            }
         }
 
         // Update the view inside of the view holder with this data

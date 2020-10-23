@@ -102,7 +102,11 @@ public class UserReg extends AppCompatActivity implements View.OnClickListener {
                             if(task.isSuccessful()){
                                 Toast.makeText(UserReg.this, "User has been Registered", Toast.LENGTH_LONG ).show();
                                 progressBar.setVisibility(View.GONE);
+
                                 // Redirect User to Login Layout
+                                Intent i = new Intent(UserReg.this, LoginActivity.class);
+                                startActivity(i);
+
                                 System.out.println("done");
                                 Log.i("Complete", "onComplete: was registred");
                             }else{

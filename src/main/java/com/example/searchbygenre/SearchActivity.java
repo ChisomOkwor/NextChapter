@@ -4,16 +4,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.app.VoiceInteractor;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.Spinner;
-import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -21,7 +17,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.gson.JsonObject;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -69,7 +64,6 @@ public class SearchActivity extends AppCompatActivity {
                 Log.i("Dropdown Response", text);
 
                 String URL = "http://openlibrary.org/subjects/" + apiTitle;
-
 
                 if (apiTitle == "none") {
                     URL = "http://openlibrary.org/subjects/horror.json?published_in=1500-1600";
@@ -125,7 +119,7 @@ public class SearchActivity extends AppCompatActivity {
 
                                     RecyclerView myrv = (RecyclerView) findViewById(R.id.recyclerview_id);
 
-                                    ItemsAdapter myAdapter = new ItemsAdapter(getBaseContext(), lstBook);
+                                    BooksAdapter myAdapter = new BooksAdapter(getBaseContext(), lstBook);
                                     myrv.setLayoutManager(new GridLayoutManager(getBaseContext(), 3));
                                     myrv.setAdapter(myAdapter);
                                 } catch (JSONException e) {
