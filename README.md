@@ -1,6 +1,6 @@
 # Next Chapter
 ### An Android app
-Next Chapter is a book club app. It gives the user the same book club experience in a vitrual format
+Next Chapter is a book club app. It offers the user a book club experience in a vitrual format
 
 
 
@@ -23,6 +23,7 @@ Next Chapter is a book club app. It gives the user the same book club experience
 - [Android] SQLite
 - Firebase OAuth
 - Firebase Realtime Database
+- etc.
 
 
 ### Notes
