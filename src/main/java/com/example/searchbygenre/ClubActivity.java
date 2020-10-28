@@ -1,5 +1,6 @@
 package com.example.searchbygenre;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,6 +19,15 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import org.parceler.Parcels;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,17 +40,24 @@ public class ClubActivity extends AppCompatActivity  {
     EditText etMessageText;
     ImageButton sendMessageBtn;
     RecyclerView rvChat;
+    String userEmail;
 
     List<ChatMessage> chatMessageList =  new ArrayList<>();
+
+    private DatabaseReference dbr;
+    String user_msg_key;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_club);
 
+        userEmail = getIntent().getExtras().getString("userEmail");
         // TODO: set this from DB
         String club_name = getIntent().getExtras().getString("CLUB_NAME");
-        getSupportActionBar().setTitle(club_name + " club room");
+        getSupportActionBar().setTitle(club_name + " Club Room");
+
+        dbr = FirebaseDatabase.getInstance().getReference().child(club_name);
 
         bookName = findViewById(R.id.bookNameClub);
         sendMessageBtn= findViewById(R.id.sendMessage);
@@ -54,6 +71,8 @@ public class ClubActivity extends AppCompatActivity  {
                 openSearchActivity();
             }
         });
+
+        loadPreviousMessages();
 
         // Receive data -- DISPLAY RECEIVED BOOK
         Intent intent = getIntent();
@@ -78,15 +97,36 @@ public class ClubActivity extends AppCompatActivity  {
         sendMessageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                displayMessages();
+                appendMessage();
+            }
+        });
+
+    }
+
+    private void loadPreviousMessages() {
+        dbr.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                chatMessageList.clear();
+                for (DataSnapshot postSnapshot: snapshot.getChildren()) {
+                    //  String clubId = postSnapshot.getKey();
+                    // DatabaseReference clubIdRef = myRef.child("Clubs").child(clubId);
+                    ChatMessage chatMessage = postSnapshot.getValue(ChatMessage.class);
+                   // System.out.println(club.club_name);
+                    chatMessageList.add(chatMessage);
+                    // Log.i("FIREBASE DB", club.getClubName());
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                System.out.println("The read failed: " + error.getMessage());
             }
         });
 
 
-        // TODO: add chat to database
     }
 
-    private void displayMessages() {
+    private void appendMessage() {
         String textMessage = etMessageText.getText().toString();
         etMessageText.setText("");
         if(textMessage.isEmpty()){
@@ -94,10 +134,12 @@ public class ClubActivity extends AppCompatActivity  {
             etMessageText.requestFocus();
             return;
         }
-        ChatMessage chatMessage = new ChatMessage(textMessage, "CHISOM");
+        ChatMessage chatMessage = new ChatMessage(textMessage, userEmail);
         // Add to Array
         chatMessageList.add(chatMessage);
-
+        // Add to DB
+        user_msg_key = dbr.push().getKey();
+        dbr.child(user_msg_key).setValue(chatMessage);
         // Notify adapter that an item is inserted
         chatAdapter.notifyItemInserted(chatMessageList.size() -1);
     }

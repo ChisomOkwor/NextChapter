@@ -1,25 +1,18 @@
 package com.example.searchbygenre;
 
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -28,9 +21,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.parceler.Parcels;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
     public static final String KEY_ITEM_TEXT = "item_text";
@@ -49,14 +43,14 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth.AuthStateListener mAuthListener;
     private String userID;
     FirebaseUser user;
+    Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         //set app logo
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setLogo(R.drawable.icon_book);
-        getSupportActionBar().setDisplayUseLogoEnabled(true);
-
+//        getSupportActionBar().setDisplayShowHomeEnabled(true);
+//        getSupportActionBar().setLogo(R.drawable.icon_book);
+//        getSupportActionBar().setDisplayUseLogoEnabled(true);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -72,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
         createBtn = findViewById(R.id.createBtn);
         etClubName = findViewById(R.id.etClubName);
         rvItems = findViewById(R.id.rvItems);
+        intent = new Intent(MainActivity.this, ClubActivity.class);
 
         loadClubList();
         getUser();
@@ -132,21 +127,22 @@ public class MainActivity extends AppCompatActivity {
                 registerClub();
             }
         });
+
     }
 
     private void openSlectedClub(int position) {
         Log.d("MainActivity", "Single click at position " + position);
         // Create the new Activity
-        Intent i = new Intent(MainActivity.this, ClubActivity.class);
+
         // Pass the data being edited
 
         Club club = items.get(position);
         // Pass the Club name
         // TODO: ACCESS CLUB NAME PERMANENTLY
-        i.putExtra("CLUB_NAME", club.getClubName());
-        i.putExtra(KEY_ITEM_POSITION, position);
+        intent.putExtra("CLUB_NAME", club.getClubName());
+        intent.putExtra(KEY_ITEM_POSITION, position);
         //Start the Club Activity
-        startActivityForResult(i, EDIT_TEXT_CODE);
+        startActivityForResult(intent, EDIT_TEXT_CODE);
     }
 
     // Push Club Info to DB
@@ -182,7 +178,6 @@ public class MainActivity extends AppCompatActivity {
                   //  String clubId = postSnapshot.getKey();
                    // DatabaseReference clubIdRef = myRef.child("Clubs").child(clubId);
                     Club club = postSnapshot.getValue(Club.class);
-                    System.out.println(club.club_name);
                     items.add(club);
                    // Log.i("FIREBASE DB", club.getClubName());
                 }
@@ -195,12 +190,13 @@ public class MainActivity extends AppCompatActivity {
     }
     // TODO: MAKE SURE GETTING USER DATA WORKS
     public void getUser(){
-        FirebaseUser user = mAuth.getCurrentUser();
-        if(user == null) {
+        if(user != null) {
             String userName = user.getDisplayName();
             String email = user.getEmail();
-
+            Log.i("USER", "getUser: " + userName );
             Log.i("USER", "getUser: " + userName + " " + email);
+            intent.putExtra("userEmail", email);
+
         } else {
             Log.i("Check logged in", "onCreate: NOT WORKING");
         }

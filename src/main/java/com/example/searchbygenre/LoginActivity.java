@@ -35,10 +35,9 @@ public class LoginActivity extends AppCompatActivity implements  View.OnClickLis
     protected void onCreate(Bundle savedInstanceState) {
         //set app logo
 
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setLogo(R.drawable.icon_book);
-        getSupportActionBar().setDisplayUseLogoEnabled(true);
-
+//        getSupportActionBar().setDisplayShowHomeEnabled(true);
+//        getSupportActionBar().setLogo(R.drawable.icon_book);
+//        getSupportActionBar().setDisplayUseLogoEnabled(true);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
