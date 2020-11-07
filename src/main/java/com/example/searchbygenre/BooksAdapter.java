@@ -12,6 +12,8 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
+import org.parceler.Parcels;
+import com.bumptech.glide.Glide;
 
 public class BooksAdapter extends RecyclerView.Adapter<BooksAdapter.MyViewHolder> {
     private Context mContext ;
@@ -36,8 +38,8 @@ public class BooksAdapter extends RecyclerView.Adapter<BooksAdapter.MyViewHolder
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, final int position) {
-
         holder.tv_book_title.setText(mData.get(position).getTitle());
+        Glide.with(mContext).load(mData.get(position).getThumbnail()).into(holder.ivCover);
 
             holder.cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -47,11 +49,14 @@ public class BooksAdapter extends RecyclerView.Adapter<BooksAdapter.MyViewHolder
                 System.out.println("Clicked ");
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-                // passing data to the book activity
-                intent.putExtra("Title",mData.get(position).getTitle());
-                intent.putExtra("Description",mData.get(position).getDescription());
-                intent.putExtra("Category",mData.get(position).getCategory());
-                // start the activity
+                String Title = mData.get(position).getTitle();
+                String Description = mData.get(position).getDescription();
+                String Category = mData.get(position).getCategory();
+                String Thumbnail = mData.get(position).getThumbnail();
+
+                Book book = new Book(Title, Category, Description, Thumbnail);
+                // Passing data to the book activity
+                    intent.putExtra("book", Parcels.wrap(book));
                 mContext.startActivity(intent);
             }
         });
@@ -64,14 +69,13 @@ public class BooksAdapter extends RecyclerView.Adapter<BooksAdapter.MyViewHolder
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
         TextView tv_book_title;
-        ImageView img_book_thumbnail;
+        ImageView ivCover;
         CardView cardView ;
 
         public MyViewHolder(View itemView) {
             super(itemView);
-
             tv_book_title = (TextView) itemView.findViewById(R.id.book_title_id) ;
-            img_book_thumbnail = (ImageView) itemView.findViewById(R.id.book_img_id);
+            ivCover = (ImageView) itemView.findViewById(R.id.book_img_id);
             cardView = (CardView) itemView.findViewById(R.id.cardview_id);
 
         }

@@ -47,11 +47,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        //set app logo
-//        getSupportActionBar().setDisplayShowHomeEnabled(true);
-//        getSupportActionBar().setLogo(R.drawable.icon_book);
-//        getSupportActionBar().setDisplayUseLogoEnabled(true);
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -71,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
         loadClubList();
         getUser();
 
-        //CHECK IS USER IS LOGGED IN
+        // CHECK IS USER IS LOGGED IN
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -97,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //DELETE A CLUB
+        // DELETE A CLUB
         ClubsAdapter.OnLongClickListener onLongClickListener = new ClubsAdapter.OnLongClickListener(){
             @Override
             public void onItemLongClicked(int position) {
@@ -114,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
         ClubsAdapter.OnClickListener onClickListener = new ClubsAdapter.OnClickListener() {
             @Override
             public void onItemClicked(int position) {
-                openSlectedClub(position);
+                openSelectedClub(position);
             }
         };
 
@@ -127,13 +122,11 @@ public class MainActivity extends AppCompatActivity {
                 registerClub();
             }
         });
-
     }
 
-    private void openSlectedClub(int position) {
+    private void openSelectedClub(int position) {
         Log.d("MainActivity", "Single click at position " + position);
         // Create the new Activity
-
         // Pass the data being edited
 
         Club club = items.get(position);
@@ -153,10 +146,11 @@ public class MainActivity extends AppCompatActivity {
             etClubName.requestFocus();
             return;
         }
-        // Change edit text item to empty
 
+        // Change edit text item to empty
         Club club = new Club(club_name);
         etClubName.setText("");
+
         // Add to Array
         items.add(club);
 
@@ -165,21 +159,21 @@ public class MainActivity extends AppCompatActivity {
 
         // Add to Firebase DB
         String key = myRef.push().getKey();
+        Log.i("DEBUGG", "registerClub: HERE");
         myRef.child(key).setValue(club);
     }
 
     public void loadClubList(){
-        //DatabaseReference myRef = database.getReference("Clubs");
         myRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 items.clear();
+                rvItems.setAdapter(clubsAdapter);
                 for (DataSnapshot postSnapshot: snapshot.getChildren()) {
-                  //  String clubId = postSnapshot.getKey();
+                   //  String clubId = postSnapshot.getKey();
                    // DatabaseReference clubIdRef = myRef.child("Clubs").child(clubId);
                     Club club = postSnapshot.getValue(Club.class);
                     items.add(club);
-                   // Log.i("FIREBASE DB", club.getClubName());
                 }
             }
             @Override

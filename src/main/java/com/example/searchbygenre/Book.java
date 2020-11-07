@@ -1,22 +1,24 @@
 package com.example.searchbygenre;
 
+import org.parceler.Parcel;
+
+@Parcel
 public class Book {
 
-    private String Title;
-    private String Category;
-    private String Description;
-
+     String Title;
+     String Category;
+     String Description;
+     String Thumbnail;
 
     public Book() {
     }
 
-    public Book(String title, String category, String description) {
+    public Book(String title, String category, String description, String thumbnail) {
         Title = title;
         Category = category;
         Description = description;
-
+        Thumbnail = thumbnail;
     }
-
 
     public String getTitle() {
         return Title;
@@ -30,8 +32,9 @@ public class Book {
         return Description;
     }
 
-
-
+    public String getThumbnail() {
+        return Thumbnail;
+    }
 
     public void setTitle(String title) {
         Title = title;
@@ -45,7 +48,8 @@ public class Book {
         Description = description;
     }
 
-    //public void setThumbnail(String thumbnail) {
-      //  ThumbnailURL = thumbnailurl;
-  // }
+    public void setThumbnail(String thumbnail) {
+        Thumbnail =  thumbnail;
+    }
+
 }

@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -29,6 +30,8 @@ public class SearchActivity extends AppCompatActivity {
     public static final String KEY_ITEM_TEXT = "item_text";
     public static final String KEY_ITEM_POSITION = "item_position";
     public static final int EDIT_TEXT_CODE = 20;
+    String Title;
+    String Description;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +39,6 @@ public class SearchActivity extends AppCompatActivity {
         setContentView(R.layout.activity_search);
 
         final Spinner mySpinner = (Spinner) findViewById(R.id.spinner);
-
         ArrayAdapter<String> myAdapter = new ArrayAdapter<String>(SearchActivity.this, simple_list_item_1,
                 getResources().getStringArray(R.array.Genre));
         myAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -51,10 +53,9 @@ public class SearchActivity extends AppCompatActivity {
         my_dict.put("Children", "juvenile_fiction.json?");
         my_dict.put("Science", "science.json?");
         my_dict.put("History", "history.json?");
-        my_dict.put("Select a Genre", "none");
+        my_dict.put("Select a Genre ⬇️", "none");
 
         mySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                 String text = mySpinner.getSelectedItem().toString();
@@ -84,41 +85,23 @@ public class SearchActivity extends AppCompatActivity {
                                     for (int i = 0; i < works.length(); ++i) {
                                         final JSONObject work = works.getJSONObject(i);
                                         String title = work.getString("title");
-                                        //work.getInt("isbn")
-                                        final String isbn = "0201558025";
-                                        String bookURL = "http://openlibrary.org/api/books?bibkeys=ISBN:"+ isbn + "&format=json";
 
-                                        JsonObjectRequest coverObjectRequest = new JsonObjectRequest(
-                                                Request.Method.GET,
-                                                bookURL,
-                                                null,
-                                                new Response.Listener<JSONObject>() {
-                                                    @Override
-                                                    public void onResponse(JSONObject response) {
-                                                        Log.e("URL RESPONSE", String.valueOf(response));
-                                                        String key = "isbn:" + isbn;
-                                                        try {
-                                                            JSONObject book = response.getJSONObject(key);
-                                                            String thumbnail_url = work.getString("thumbnail_url");
-                                                            String info_url = work.getString("info_url");
-                                                            String preview_url = work.getString("preview_url");
-                                                        } catch (JSONException e) {
-                                                            e.printStackTrace();
-                                                        }
-                                                    }
-                                                },new Response.ErrorListener() {
-                                                @Override
-                                                public void onErrorResponse(VolleyError error) {
-                                                Log.e("Rest Response", error.toString());
-                                                }
-                                            });
+                                        JSONArray authors = work.getJSONArray("authors");
+                                        JSONObject authorObject = authors.getJSONObject(0);
+                                        String authorName = authorObject.getString("name");
 
-                                        lstBook.add(new Book(title, "Category", "Description"));
+                                        JSONArray subjects = work.getJSONArray("subject");
+                                        String category = subjects.getString(0);
+
+                                        int coverId = work.getInt("cover_id");
+
+                                        String bookURL = "http://covers.openlibrary.org/b/id/" + coverId + "-M.jpg";
+
+                                        lstBook.add(new Book(title, category, "BY: " + authorName, bookURL));
                                     }
                                     //   Log.i("Book array Response", lstBook.toString());
 
                                     RecyclerView myrv = (RecyclerView) findViewById(R.id.recyclerview_id);
-
                                     BooksAdapter myAdapter = new BooksAdapter(getBaseContext(), lstBook);
                                     myrv.setLayoutManager(new GridLayoutManager(getBaseContext(), 3));
                                     myrv.setAdapter(myAdapter);

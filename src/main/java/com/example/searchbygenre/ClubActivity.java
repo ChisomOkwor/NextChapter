@@ -4,16 +4,10 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.app.Activity;
-import android.app.VoiceInteractor;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -32,33 +26,42 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ClubActivity extends AppCompatActivity  {
+    private static final int REQUEST_CODE = 20;
     Button searchForBook;
     TextView bookName;
-
     //Chat feature
     ChatAdapter chatAdapter;
     EditText etMessageText;
     ImageButton sendMessageBtn;
     RecyclerView rvChat;
-    String userEmail;
-
+    static String userEmail;
+    static String club_name;
     List<ChatMessage> chatMessageList =  new ArrayList<>();
-
     private DatabaseReference dbr;
     String user_msg_key;
+    Book book;
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        if(savedInstanceState != null) {
+            Log.i("DEBUGG APP NAME", " onSaveInstanceState:  HERE");
+            savedInstanceState.putString("CLUB_NAME", getIntent().getExtras().getString("CLUB_NAME"));
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_club);
 
+        // Club name and Email does not persist, when I switch intents
+        club_name = getIntent().getExtras().getString("CLUB_NAME");
         userEmail = getIntent().getExtras().getString("userEmail");
-        // TODO: set this from DB
-        String club_name = getIntent().getExtras().getString("CLUB_NAME");
-        getSupportActionBar().setTitle(club_name + " Club Room");
+        getSupportActionBar().setTitle("History" + " Club Room");
 
-        dbr = FirebaseDatabase.getInstance().getReference().child(club_name);
-
+        Log.i("DEBUGG APP NAME", " onSaveInstanceState:  " +  club_name);
+        dbr = FirebaseDatabase.getInstance().getReference().child("History");
         bookName = findViewById(R.id.bookNameClub);
         sendMessageBtn= findViewById(R.id.sendMessage);
         etMessageText = findViewById(R.id.etEnterMessage);
@@ -72,22 +75,14 @@ public class ClubActivity extends AppCompatActivity  {
             }
         });
 
-        loadPreviousMessages();
-
-        // Receive data -- DISPLAY RECEIVED BOOK
+        // TODO: set this from DB
+        // TODO: Add book to data base under club(Save permanently)
         Intent intent = getIntent();
-        String Title = intent.getExtras().getString("Title");
-        String Description = intent.getExtras().getString("Description");
-        String Genre = intent.getExtras().getString("Description");
-
-        Log.i("BOOK ","Received book: " + Title);
-        Book book = new Book(Title, Genre, Description);
-
-        if(Title != null){
-            bookName.setText("Current Book "+ Title);
+        if(intent.getParcelableExtra("bookSelected") != null){
+            Log.i("DEBUGG APP NAME", " onSaveInstanceState:  Gotten book HERE");
+            book = Parcels.unwrap(intent.getParcelableExtra("bookSelected"));
+            bookName.setText("Current Book: "+ book.getTitle());
             searchForBook.setText("Reselect a book");
-
-            // TODO: Add book to data base under club(Save permanently)
         }
 
         // Set array in chat adapter
@@ -100,7 +95,7 @@ public class ClubActivity extends AppCompatActivity  {
                 appendMessage();
             }
         });
-
+        loadPreviousMessages();
     }
 
     private void loadPreviousMessages() {
@@ -108,6 +103,7 @@ public class ClubActivity extends AppCompatActivity  {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 chatMessageList.clear();
+                rvChat.setAdapter(chatAdapter);
                 for (DataSnapshot postSnapshot: snapshot.getChildren()) {
                     //  String clubId = postSnapshot.getKey();
                     // DatabaseReference clubIdRef = myRef.child("Clubs").child(clubId);
@@ -122,8 +118,6 @@ public class ClubActivity extends AppCompatActivity  {
                 System.out.println("The read failed: " + error.getMessage());
             }
         });
-
-
     }
 
     private void appendMessage() {
@@ -141,14 +135,12 @@ public class ClubActivity extends AppCompatActivity  {
         user_msg_key = dbr.push().getKey();
         dbr.child(user_msg_key).setValue(chatMessage);
         // Notify adapter that an item is inserted
-        chatAdapter.notifyItemInserted(chatMessageList.size() -1);
-    }
-    ;
+       chatAdapter.notifyItemInserted(chatMessageList.size() -1);
+    };
 
     public void openSearchActivity(){
         Intent intent = new Intent(this, SearchActivity.class);
-        startActivity(intent);
+        startActivityForResult(intent, 0);
+       // startActivity(intent);
     }
-
-
 }
